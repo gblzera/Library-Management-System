@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários - Sistema de Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Sistema de Biblioteca</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Livros</a></li>
+                    <li><a href="users.html" class="active">Usuários</a></li>
+                    <li><a href="loans.html">Empréstimos</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="actions">
+            <h2>Gerenciamento de Usuários</h2>
+            <button id="addUserBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Adicionar Usuário
+            </button>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar usuários...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <div class="filter-container">
+                <label for="userTypeFilter">Filtrar por tipo:</label>
+                <select id="userTypeFilter">
+                    <option value="">Todos</option>
+                    <option value="student">Estudantes</option>
+                    <option value="teacher">Professores</option>
+                    <option value="staff">Funcionários</option>
+                </select>
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter">
+                    <option value="">Todos</option>
+                    <option value="active">Ativos</option>
+                    <option value="inactive">Inativos</option>
+                    <option value="suspended">Suspensos</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="user-list">
+            <div class="loader" id="loader"></div>
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Empréstimos Ativos</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Dados dos usuários serão inseridos aqui via JavaScript -->
+                </tbody>
+            </table>
+            <div id="noUsers" class="hidden">Nenhum usuário encontrado.</div>
+        </section>
+    </main>
+
+    <!-- Modal para adicionar/editar usuário -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Adicionar Usuário</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userType">Tipo de Usuário</label>
+                        <select id="userType" required>
+                            <option value="student">Estudante</option>
+                            <option value="teacher">Professor</option>
+                            <option value="staff">Funcionário</option>
+                        </select>
+                    </div>
+                    <div class="form-group student-field">
+                        <label for="studentId">Matrícula</label>
+                        <input type="text" id="studentId">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Departamento/Curso</label>
+                        <input type="text" id="department">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefone</label>
+                        <input type="tel" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Endereço</label>
+                        <textarea id="address" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="active">Ativo</option>
+                            <option value="inactive">Inativo</option>
+                            <option value="suspended">Suspenso</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <button type="button" class="btn btn-danger" id="cancelBtn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar detalhes do usuário -->
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalhes do Usuário</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="userDetails">
+                    <!-- Detalhes do usuário serão inseridos aqui -->
+                </div>
+                <div id="userLoans">
+                    <h4>Empréstimos</h4>
+                    <div class="loader" id="loansLoader"></div>
+                    <table id="userLoansTable">
+                        <thead>
+                            <tr>
+                                <th>Livro</th>
+                                <th>Data de Empréstimo</th>
+                                <th>Prazo de Devolução</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userLoansTableBody">
+                            <!-- Empréstimos do usuário serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                    <div id="noLoans" class="hidden">Nenhum empréstimo encontrado.</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="closeDetailsBtn">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/users.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Empréstimos - Sistema de Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Sistema de Biblioteca</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Livros</a></li>
+                    <li><a href="users.html">Usuários</a></li>
+                    <li><a href="loans.html" class="active">Empréstimos</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="actions">
+            <h2>Gerenciamento de Empréstimos</h2>
+            <button id="createLoanBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Empréstimo
+            </button>
+        </section>
+
+        <section class="filter-section">
+            <div class="filter-container">
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter">
+                    <option value="all">Todos</option>
+                    <option value="pending">Pendente</option>
+                    <option value="returned">Devolvido</option>
+                    <option value="overdue">Atrasado</option>
+                </select>
+                <button id="filterBtn" class="btn btn-secondary">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </section>
+
+        <section class="loan-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuário</th>
+                        <th>Livro</th>
+                        <th>Data de Empréstimo</th>
+                        <th>Data de Devolução</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="loanTableBody">
+                    <!-- Linhas de empréstimos serão inseridas aqui dinamicamente -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

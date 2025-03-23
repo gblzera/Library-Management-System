@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento de Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Sistema de Biblioteca</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Livros</a></li>
+                    <li><a href="users.html">Usuários</a></li>
+                    <li><a href="loans.html">Empréstimos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="actions">
+            <h2>Gerenciamento de Livros</h2>
+            <button id="addBookBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Adicionar Livro
+            </button>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar livros...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+        </section>
+
+        <section class="book-list">
+            <div class="loader" id="loader"></div>
+            <table id="booksTable">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoria</th>
+                        <th>Cópias Disponíveis</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="booksTableBody">
+                    <!-- Dados dos livros serão inseridos aqui via JavaScript -->
+                </tbody>
+            </table>
+            <div id="noBooks" class="hidden">Nenhum livro encontrado.</div>
+        </section>
+    </main>
+
+    <!-- Modal para adicionar/editar livro -->
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Adicionar Livro</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <input type="hidden" id="bookId">
+                    <div class="form-group">
+                        <label for="title">Título</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Autor</label>
+                        <input type="text" id="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="publisher">Editora</label>
+                        <input type="text" id="publisher">
+                    </div>
+                    <div class="form-group">
+                        <label for="publicationYear">Ano de Publicação</label>
+                        <input type="number" id="publicationYear" min="1000" max="2099">
+                    </div>
+                    <div class="form-group">
+                        <label for="isbn">ISBN</label>
+                        <input type="text" id="isbn">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Categoria</label>
+                        <input type="text" id="category">
+                    </div>
+                    <div class="form-group">
+                        <label for="copies">Quantidade de Cópias</label>
+                        <input type="number" id="copies" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Localização</label>
+                        <input type="text" id="location" placeholder="Ex: Prateleira A, Estante 3">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <button type="button" class="btn btn-danger" id="cancelBtn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/books.js"></script>
+</body>
+</html>

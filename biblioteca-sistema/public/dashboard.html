@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Sistema de Biblioteca</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <style>
+    .dashboard-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+    .icon-box {
+      font-size: 2.5rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stat-card-books {
+      background-color: #e3f2fd;
+      color: #0d47a1;
+    }
+    .stat-card-users {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+    .stat-card-loans {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    .stat-card-overdue {
+      background-color: #ffebee;
+      color: #b71c1c;
+    }
+    .chart-container {
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse" style="min-height: 100vh;">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active text-white" href="dashboard.html">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="books.html">
+                <i class="fas fa-book me-2"></i>
+                Livros
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="users.html">
+                <i class="fas fa-users me-2"></i>
+                Usuários
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="loans.html">
+                <i class="fas fa-exchange-alt me-2"></i>
+                Empréstimos
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Dashboard</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+                <i class="fas fa-sync-alt"></i> Atualizar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+          <div class="col-md-6 col-xl-3 mb-4">
+            <div class="dashboard-card card p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-0">Total de Livros</h6>
+                  <h3 class="mt-2 mb-0" id="totalBooks">0</h3>
+                </div>
+                <div class="icon-box stat-card-books">
+                  <i class="fas fa-book"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="books.html" class="text-decoration-none">Gerenciar Livros</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3 mb-4">
+            <div class="dashboard-card card p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-0">Total de Usuários</h6>
+                  <h3 class="mt-2 mb-0" id="totalUsers">0</h3>
+                </div>
+                <div class="icon-box stat-card-users">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="users.html" class="text-decoration-none">Gerenciar Usuários</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3 mb-4">
+            <div class="dashboard-card card p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-0">Empréstimos Ativos</h6>
+                  <h3 class="mt-2 mb-0" id="activeLoans">0</h3>
+                </div>
+                <div class="icon-box stat-card-loans">
+                  <i class="fas fa-exchange-alt"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="loans.html" class="text-decoration-none">Gerenciar Empréstimos</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3 mb-4">
+            <div class="dashboard-card card p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-0">Empréstimos Atrasados</h6>
+                  <h3 class="mt-2 mb-0" id="overdueLoans">0</h3>
+                </div>
+                <div class="icon-box stat-card-overdue">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="loans.html?filter=overdue" class="text-decoration-none">Ver Atrasados</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+          <div class="col-md-6 mb-4">
+            <div class="dashboard-card card p-3">
+              <h5 class="mb-3">Empréstimos dos Últimos 6 Meses</h5>
+              <div class="chart-container">
+                <canvas id="loansChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="dashboard-card card p-3">
+              <h5 class="mb-3">Top 5 Livros Mais Emprestados</h5>
+              <div class="chart-container">
+                <canvas id="topBooksChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Loans Table -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="dashboard-card card p-3">
+              <h5 class="mb-3">Empréstimos Recentes</h5>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Livro</th>
+                      <th>Usuário</th>
+                      <th>Data de Empréstimo</th>
+                      <th>Data de Devolução</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentLoansTable">
+                    <tr>
+                      <td colspan="5" class="text-center">Carregando...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end mt-3">
+                <a href="loans.html" class="btn btn-outline-primary btn-sm">Ver Todos os Empréstimos</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script>
+    // Função para formatar datas
+    function formatDate(dateString) {
+      const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      return new Date(dateString).toLocaleDateString('pt-BR', options);
+    }
+
+    // Função para carregar e exibir os dados do dashboard
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/api/statistics');
+        const data = await response.json();
+        
+        // Atualizar os cards de estatísticas
+        document.getElementById('totalBooks').textContent = data.totalBooks;
+        document.getElementById('totalUsers').textContent = data.totalUsers;
+        document.getElementById('activeLoans').textContent = data.activeLoans;
+        document.getElementById('overdueLoans').textContent = data.overdueLoans;
+        
+        // Criar gráfico de empréstimos por mês
+        createMonthlyLoansChart(data.loansByMonth);
+        
+        // Criar gráfico de livros mais emprestados
+        createTopBooksChart(data.topBooks);
+        
+        // Carregar empréstimos recentes
+        loadRecentLoans();
+      } catch (error) {
+        console.error('Erro ao carregar dados do dashboard:', error);
+      }
+    }
+    
+    // Função para criar o gráfico de empréstimos mensais
+    function createMonthlyLoansChart(data) {
+      const months = data.map(item => {
+        const [year, month] = item.month.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+      });
+      
+      const values = data.map(item => item.count);
+      
+      const ctx = document.getElementById('loansChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Número de Empréstimos',
+            data: values,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Função para criar o gráfico de livros mais emprestados
+    function createTopBooksChart(data) {
+      const books = data.map(item => item.title);
+      const counts = data.map(item => item.count);
+      
+      const ctx = document.getElementById('topBooksChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: books,
+          datasets: [{
+            label: 'Número de Empréstimos',
+            data: counts,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+    
+    // Função para carregar empréstimos recentes
+    async function loadRecentLoans() {
+      try {
+        const response = await fetch('/api/loans?limit=5&sort=-issueDate');
+        const loans = await response.json();
+        
+        const tableBody = document.getElementById('recentLoansTable');
+        
+        if (loans.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum empréstimo encontrado</td></tr>';
+          return;
+        }
+        
+        tableBody.innerHTML = '';
+        
+        for (const loan of loans) {
+          const statusClass = loan.status === 'active' ? 'success' : 
+                             loan.status === 'overdue' ? 'danger' : 'secondary';
+          
+          const statusLabel = loan.status === 'active' ? 'Ativo' : 
+                             loan.status === 'overdue' ? 'Atrasado' : 'Devolvido';
+          
+          tableBody.innerHTML += `
+            <tr>
+              <td>${loan.book.title}</td>
+              <td>${loan.user.name}</td>
+              <td>${formatDate(loan.issueDate)}</td>
+              <td>${formatDate(loan.returnDate)}</td>
+              <td><span class="badge bg-${statusClass}">${statusLabel}</span></td>
+            </tr>
+          `;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar empréstimos recentes:', error);
+        document.getElementById('recentLoansTable').innerHTML = 
+          '<tr><td colspan="5" class="text-center">Erro ao carregar dados</td></tr>';
+      }
+    }
+    
+    // Carregar dados iniciais
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      
+      // Botão de atualização
+      document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
+    });
+  </script>
+</body>
+</html>
