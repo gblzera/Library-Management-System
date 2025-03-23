@@ -1,179 +1,197 @@
-// models/User.js (referência)
-/*
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['funcionario', 'estudante', 'professor'], required: true },
-  createdAt: { type: Date, default: Date.now }
-});
-*/
+const API_URL = 'http://localhost:5000/api';
+const usersTableBody = document.getElementById('usersTableBody');
+const userModal = document.getElementById('userModal');
+const userForm = document.getElementById('userForm');
+const modalTitle = document.getElementById('modalTitleUser');
+const loader = document.getElementById('loader');
+const noUsers = document.getElementById('noUsers');
+const searchInput = document.getElementById('searchUserInput');
+const searchBtn = document.getElementById('searchUserBtn');
 
-// routes/users.js
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+let users = [];
+let currentUserId = null;
 
-// @rota    GET /api/users
-// @desc    Obter todos os usuários
-// @acesso  Público (considerando que você irá implementar autenticação depois)
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
-    res.json(users);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Erro no servidor');
-  }
+document.addEventListener('DOMContentLoaded', fetchUsers);
+document.getElementById('addUserBtn').addEventListener('click', showAddUserModal);
+document.getElementById('cancelUserBtn').addEventListener('click', closeUserModal);
+document.querySelector('.closeUser').addEventListener('click', closeUserModal);
+userForm.addEventListener('submit', handleUserSubmit);
+searchBtn.addEventListener('click', searchUsers);
+searchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') searchUsers();
 });
 
-// @rota    GET /api/users/:id
-// @desc    Obter usuário por ID
-// @acesso  Público
-router.get('/:id', async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select('-password');
-    
-    if (!user) {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
+window.addEventListener('click', (e) => {
+    if (e.target === userModal) {
+        closeUserModal();
     }
-    
-    res.json(user);
-  } catch (err) {
-    console.error(err.message);
-    
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
-    }
-    
-    res.status(500).send('Erro no servidor');
-  }
 });
 
-// @rota    POST /api/users
-// @desc    Registrar um usuário
-// @acesso  Público
-router.post('/', async (req, res) => {
-  const { name, email, password, role } = req.body;
+async function fetchUsers() {
+    showLoader();
+    try {
+        const response = await fetch(`${API_URL}/users`);
+        if (!response.ok) throw new Error('Erro ao buscar usuários');
 
-  try {
-    // Verificar se o usuário já existe
-    let user = await User.findOne({ email });
+        users = await response.json();
+        renderUsers(users);
+    } catch (error) {
+        showError('Não foi possível carregar os usuários.');
+        console.error(error);
+    } finally {
+        hideLoader();
+    }
+}
 
-    if (user) {
-      return res.status(400).json({ msg: 'Usuário já existe' });
+async function addUser(userData) {
+    showLoader();
+    try {
+        const response = await fetch(`${API_URL}/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) throw new Error('Erro ao adicionar usuário');
+
+        const newUser = await response.json();
+        users.push(newUser);
+        renderUsers(users);
+        closeUserModal();
+        showMessage('Usuário adicionado com sucesso!');
+    } catch (error) {
+        showError('Erro ao adicionar usuário.');
+        console.error(error);
+    } finally {
+        hideLoader();
+    }
+}
+
+async function updateUser(id, userData) {
+    showLoader();
+    try {
+        const response = await fetch(`${API_URL}/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) throw new Error('Erro ao atualizar usuário');
+
+        users = users.map(user => user._id === id ? { ...user, ...userData } : user);
+        renderUsers(users);
+        closeUserModal();
+        showMessage('Usuário atualizado com sucesso!');
+    } catch (error) {
+        showError('Erro ao atualizar usuário.');
+        console.error(error);
+    } finally {
+        hideLoader();
+    }
+}
+
+async function deleteUser(id) {
+    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+    showLoader();
+    try {
+        const response = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
+
+        if (!response.ok) throw new Error('Erro ao excluir usuário');
+
+        users = users.filter(user => user._id !== id);
+        renderUsers(users);
+        showMessage('Usuário excluído com sucesso!');
+    } catch (error) {
+        showError('Erro ao excluir usuário.');
+        console.error(error);
+    } finally {
+        hideLoader();
+    }
+}
+
+function renderUsers(usersToRender) {
+    if (usersToRender.length === 0) {
+        usersTableBody.innerHTML = '';
+        noUsers.classList.remove('hidden');
+        return;
     }
 
-    // Criar o novo usuário
-    user = new User({
-      name,
-      email,
-      password,
-      role
-    });
+    noUsers.classList.add('hidden');
+    usersTableBody.innerHTML = usersToRender.map(user => `
+        <tr>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.role}</td>
+            <td>
+                <button class="btn btn-warning btn-sm" onclick="showEditUserModal('${user._id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
 
-    // Criptografar a senha
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+function showAddUserModal() {
+    currentUserId = null;
+    modalTitle.textContent = 'Adicionar Usuário';
+    userForm.reset();
+    userModal.style.display = 'block';
+}
 
-    // Salvar o usuário
-    await user.save();
+function showEditUserModal(id) {
+    currentUserId = id;
+    modalTitle.textContent = 'Editar Usuário';
 
-    // Retornar o usuário sem a senha
-    const userResponse = { ...user.toObject() };
-    delete userResponse.password;
-    
-    res.status(201).json(userResponse);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Erro no servidor');
-  }
-});
+    const user = users.find(u => u._id === id);
+    if (!user) return;
 
-// @rota    PUT /api/users/:id
-// @desc    Atualizar um usuário
-// @acesso  Público (por enquanto)
-router.put('/:id', async (req, res) => {
-  const { name, email, role, password } = req.body;
+    document.getElementById('name').value = user.name;
+    document.getElementById('email').value = user.email;
+    document.getElementById('role').value = user.role || 'Usuário';
 
-  // Construir o objeto de usuário
-  const userFields = {};
-  if (name) userFields.name = name;
-  if (email) userFields.email = email;
-  if (role) userFields.role = role;
+    userModal.style.display = 'block';
+}
 
-  try {
-    // Verificar se o usuário existe
-    let user = await User.findById(req.params.id);
+function closeUserModal() {
+    userModal.style.display = 'none';
+}
 
-    if (!user) {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
+function handleUserSubmit(e) {
+    e.preventDefault();
+
+    const userData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        role: document.getElementById('role').value || 'Usuário'
+    };
+
+    if (currentUserId) {
+        updateUser(currentUserId, userData);
+    } else {
+        addUser(userData);
+    }
+}
+
+function searchUsers() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+
+    if (!searchTerm) {
+        renderUsers(users);
+        return;
     }
 
-    // Atualizar a senha se fornecida
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      userFields.password = await bcrypt.hash(password, salt);
-    }
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm)
+    );
 
-    // Atualizar o usuário
-    user = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: userFields },
-      { new: true }
-    ).select('-password');
+    renderUsers(filteredUsers);
+}
 
-    res.json(user);
-  } catch (err) {
-    console.error(err.message);
-    
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
-    }
-    
-    res.status(500).send('Erro no servidor');
-  }
-});
-
-// @rota    DELETE /api/users/:id
-// @desc    Deletar um usuário
-// @acesso  Público (por enquanto)
-router.delete('/:id', async (req, res) => {
-  try {
-    // Verificar se o usuário existe
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
-    }
-
-    // Remover o usuário
-    await User.findByIdAndRemove(req.params.id);
-
-    res.json({ msg: 'Usuário removido' });
-  } catch (err) {
-    console.error(err.message);
-    
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
-    }
-    
-    res.status(500).send('Erro no servidor');
-  }
-});
-
-// @rota    GET /api/users/role/:role
-// @desc    Obter usuários por role (funcionário, estudante, professor)
-// @acesso  Público
-router.get('/role/:role', async (req, res) => {
-  try {
-    const users = await User.find({ role: req.params.role }).select('-password');
-    res.json(users);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Erro no servidor');
-  }
-});
-
-module.exports = router;
+// Funções globais
+window.showEditUserModal = showEditUserModal;
+window.deleteUser = deleteUser;
